@@ -1,85 +1,16 @@
-// User Management System
-class UserManager {
-    constructor() {
-        this.users = this.loadUsers();
-    }
+// Simple User Management
+const users = JSON.parse(localStorage.getItem('ticTacUsers') || '[]');
 
-    loadUsers() {
-        try {
-            // For demo - in real scenario, this would fetch from a server
-            const defaultUsers = {
-                users: [
-                    {
-                        username: "player",
-                        email: "player@example.com",
-                        password: "1234",
-                        createdAt: new Date().toISOString(),
-                        stats: { gamesPlayed: 0, wins: 0, losses: 0, draws: 0 }
-                    }
-                ]
-            };
-            return defaultUsers.users;
-        } catch (error) {
-            console.error('Error loading users:', error);
-            return [];
-        }
-    }
-
-    saveUsers() {
-        // In a real app, this would send data to a server
-        console.log('Users saved (simulated):', this.users);
-        localStorage.setItem('ticTacUsers', JSON.stringify(this.users));
-    }
-
-    registerUser(username, email, password) {
-        // Check if user already exists
-        if (this.users.find(user => user.username === username)) {
-            return { success: false, message: 'Username already exists' };
-        }
-
-        if (this.users.find(user => user.email === email)) {
-            return { success: false, message: 'Email already registered' };
-        }
-
-        // Create new user
-        const newUser = {
-            username,
-            email,
-            password, // In real app, hash this password
-            createdAt: new Date().toISOString(),
-            stats: { gamesPlayed: 0, wins: 0, losses: 0, draws: 0 }
-        };
-
-        this.users.push(newUser);
-        this.saveUsers();
-
-        return { success: true, message: 'Registration successful!' };
-    }
-
-    loginUser(username, password) {
-        const user = this.users.find(u => u.username === username && u.password === password);
-        if (user) {
-            return { success: true, user };
-        }
-        return { success: false, message: 'Invalid username or password' };
-    }
-
-    updateUserStats(username, result) {
-        const user = this.users.find(u => u.username === username);
-        if (user) {
-            user.stats.gamesPlayed++;
-            
-            if (result === 'win') user.stats.wins++;
-            else if (result === 'loss') user.stats.losses++;
-            else if (result === 'draw') user.stats.draws++;
-            
-            this.saveUsers();
-        }
-    }
+// Add default user if none exists
+if (users.length === 0) {
+    users.push({
+        username: "player",
+        email: "player@example.com",
+        password: "1234",
+        stats: { wins: 0, losses: 0, draws: 0 }
+    });
+    localStorage.setItem('ticTacUsers', JSON.stringify(users));
 }
-
-// Initialize User Manager
-const userManager = new UserManager();
 
 // DOM Elements
 const loginBox = document.getElementById('loginBox');
@@ -90,7 +21,7 @@ const showRegister = document.getElementById('showRegister');
 const showLogin = document.getElementById('showLogin');
 const gameContainer = document.querySelector('.game-container');
 
-// Switch between login and register forms
+// Switch between forms
 showRegister.addEventListener('click', (e) => {
     e.preventDefault();
     loginBox.style.display = 'none';
@@ -103,87 +34,61 @@ showLogin.addEventListener('click', (e) => {
     loginBox.style.display = 'block';
 });
 
-// Login Form Handler
+// Login
 loginForm.addEventListener('submit', function(e) {
     e.preventDefault();
-    
     const username = document.getElementById('loginUsername').value;
     const password = document.getElementById('loginPassword').value;
     
-    const result = userManager.loginUser(username, password);
-    
-    if (result.success) {
-        showGame(result.user);
+    const user = users.find(u => u.username === username && u.password === password);
+    if (user) {
+        showGame(user);
     } else {
-        showMessage(result.message, 'error');
+        alert('Invalid login! Try: player/1234');
     }
 });
 
-// Register Form Handler
+// Register
 registerForm.addEventListener('submit', function(e) {
     e.preventDefault();
-    
     const username = document.getElementById('regUsername').value;
     const email = document.getElementById('regEmail').value;
     const password = document.getElementById('regPassword').value;
     const confirmPassword = document.getElementById('regConfirmPassword').value;
     
-    // Validation
     if (password !== confirmPassword) {
-        showMessage('Passwords do not match!', 'error');
+        alert('Passwords do not match!');
         return;
     }
     
-    if (password.length < 4) {
-        showMessage('Password must be at least 4 characters', 'error');
+    if (users.find(u => u.username === username)) {
+        alert('Username already exists!');
         return;
     }
     
-    const result = userManager.registerUser(username, email, password);
+    const newUser = {
+        username,
+        email,
+        password,
+        stats: { wins: 0, losses: 0, draws: 0 }
+    };
     
-    if (result.success) {
-        showMessage(result.message, 'success');
-        // Switch to login form after successful registration
-        setTimeout(() => {
-            registerBox.style.display = 'none';
-            loginBox.style.display = 'block';
-            registerForm.reset();
-        }, 1500);
-    } else {
-        showMessage(result.message, 'error');
-    }
+    users.push(newUser);
+    localStorage.setItem('ticTacUsers', JSON.stringify(users));
+    alert('Registration successful!');
+    registerBox.style.display = 'none';
+    loginBox.style.display = 'block';
+    registerForm.reset();
 });
 
-function showMessage(message, type) {
-    // Remove existing messages
-    const existingMessage = document.querySelector('.message');
-    if (existingMessage) {
-        existingMessage.remove();
-    }
-    
-    const messageDiv = document.createElement('div');
-    messageDiv.className = `message ${type}`;
-    messageDiv.textContent = message;
-    
-    const currentForm = loginBox.style.display !== 'none' ? loginBox : registerBox;
-    currentForm.insertBefore(messageDiv, currentForm.querySelector('form'));
-    
-    setTimeout(() => {
-        messageDiv.remove();
-    }, 3000);
-}
-
+// Show Game
 function showGame(user) {
     document.querySelector('.auth-container').style.display = 'none';
     gameContainer.style.display = 'block';
     
-    // Create game HTML with user stats
     gameContainer.innerHTML = `
         <h1>Tic Tac Toe</h1>
-        <div class="player-info">
-            Welcome, ${user.username}! 
-            <br>Stats: ${user.stats.wins}W ${user.stats.losses}L ${user.stats.draws}D
-        </div>
+        <div class="player-info">Welcome, ${user.username}! (W:${user.stats.wins} L:${user.stats.losses} D:${user.stats.draws})</div>
         
         <div class="score-board">
             <div class="score-item">
@@ -211,15 +116,15 @@ function showGame(user) {
         
         <div class="status" id="status">Your Turn (X)</div>
         <div class="board" id="board">
-            <div class="cell" data-index="0"></div>
-            <div class="cell" data-index="1"></div>
-            <div class="cell" data-index="2"></div>
-            <div class="cell" data-index="3"></div>
-            <div class="cell" data-index="4"></div>
-            <div class="cell" data-index="5"></div>
-            <div class="cell" data-index="6"></div>
-            <div class="cell" data-index="7"></div>
-            <div class="cell" data-index="8"></div>
+            <div class="cell" data-index="0">-</div>
+            <div class="cell" data-index="1">-</div>
+            <div class="cell" data-index="2">-</div>
+            <div class="cell" data-index="3">-</div>
+            <div class="cell" data-index="4">-</div>
+            <div class="cell" data-index="5">-</div>
+            <div class="cell" data-index="6">-</div>
+            <div class="cell" data-index="7">-</div>
+            <div class="cell" data-index="8">-</div>
         </div>
         <div class="game-controls">
             <button id="reset">New Game</button>
@@ -227,83 +132,55 @@ function showGame(user) {
         </div>
     `;
     
-    // FIX: Wait for DOM to be ready
-    setTimeout(() => {
-        initializeGame(user);
-    }, 100);
-    
-    // Logout button
-    document.getElementById('logout').addEventListener('click', function() {
-        gameContainer.style.display = 'none';
-        document.querySelector('.auth-container').style.display = 'block';
-        document.getElementById('loginUsername').value = '';
-        document.getElementById('loginPassword').value = '';
-    });
+    // Initialize game immediately
+    initGame(user);
 }
 
-// Game Logic - Human vs Computer
-function initializeGame(user) {
+// Game Logic
+function initGame(user) {
+    let currentPlayer = 'X';
+    let gameState = ['', '', '', '', '', '', '', '', ''];
+    let gameActive = true;
+    let scores = { player: 0, computer: 0, draw: 0 };
+
+    const winningConditions = [
+        [0, 1, 2], [3, 4, 5], [6, 7, 8],
+        [0, 3, 6], [1, 4, 7], [2, 5, 8],
+        [0, 4, 8], [2, 4, 6]
+    ];
+
     const cells = document.querySelectorAll('.cell');
     const statusDisplay = document.getElementById('status');
     const resetButton = document.getElementById('reset');
-    const difficultySelect = document.getElementById('difficulty');
 
-    let currentPlayer = 'X'; // Human always starts
-    let gameState = ['', '', '', '', '', '', '', '', ''];
-    let gameActive = true;
-    let sessionScores = { player: 0, computer: 0, draw: 0 };
-
-    const winningConditions = [
-        [0, 1, 2], [3, 4, 5], [6, 7, 8], // rows
-        [0, 3, 6], [1, 4, 7], [2, 5, 8], // columns
-        [0, 4, 8], [2, 4, 6] // diagonals
-    ];
-
-    // Initialize cells with event listeners
+    // Add click events to cells
     cells.forEach(cell => {
-        // Remove any existing event listeners
-        cell.replaceWith(cell.cloneNode(true));
+        cell.onclick = function() {
+            if (!gameActive || currentPlayer !== 'X') return;
+            
+            const index = parseInt(this.getAttribute('data-index'));
+            if (gameState[index] !== '') return;
+            
+            // Human move
+            makeMove(index, 'X');
+            this.classList.add('player-move');
+            
+            if (checkResult()) return;
+            
+            // Computer move
+            currentPlayer = 'O';
+            statusDisplay.textContent = 'Computer thinking...';
+            
+            setTimeout(() => {
+                if (gameActive) {
+                    const compMove = getComputerMove();
+                    makeMove(compMove, 'O');
+                    document.querySelector(`[data-index="${compMove}"]`).classList.add('computer-move');
+                    checkResult();
+                }
+            }, 800);
+        };
     });
-
-    // Get fresh references after clone
-    const freshCells = document.querySelectorAll('.cell');
-    
-    freshCells.forEach(cell => {
-        cell.addEventListener('click', handleCellClick);
-        cell.classList.remove('x', 'o', 'winner', 'draw', 'player-move', 'computer-move');
-    });
-
-    function handleCellClick(clickedCellEvent) {
-        if (!gameActive || currentPlayer !== 'X') return;
-
-        const clickedCell = clickedCellEvent.target;
-        const clickedCellIndex = parseInt(clickedCell.getAttribute('data-index'));
-
-        if (gameState[clickedCellIndex] !== '') return;
-
-        // Human move
-        makeMove(clickedCellIndex, 'X');
-        clickedCell.classList.add('player-move');
-
-        if (checkResult()) return;
-
-        // Computer's turn
-        currentPlayer = 'O';
-        statusDisplay.innerHTML = 'Computer thinking...';
-        statusDisplay.classList.add('computer-thinking');
-
-        setTimeout(() => {
-            if (gameActive) {
-                const computerMove = getComputerMove();
-                makeMove(computerMove, 'O');
-                
-                const computerCell = document.querySelector(`[data-index="${computerMove}"]`);
-                computerCell.classList.add('computer-move');
-                
-                checkResult();
-            }
-        }, 1000);
-    }
 
     function makeMove(index, player) {
         gameState[index] = player;
@@ -313,67 +190,36 @@ function initializeGame(user) {
     }
 
     function getComputerMove() {
-        const difficulty = difficultySelect.value;
-        let availableMoves = gameState.map((val, index) => val === '' ? index : null).filter(val => val !== null);
-
-        // Easy: Random moves
+        const difficulty = document.getElementById('difficulty').value;
+        let available = gameState.map((val, idx) => val === '' ? idx : null).filter(val => val !== null);
+        
         if (difficulty === 'easy') {
-            return availableMoves[Math.floor(Math.random() * availableMoves.length)];
+            return available[Math.floor(Math.random() * available.length)];
         }
-
-        // Medium: Sometimes smart, sometimes random
-        if (difficulty === 'medium') {
-            if (Math.random() < 0.7) { // 70% smart moves
-                const smartMove = findWinningMove('O') || findWinningMove('X') || findBestMove();
-                if (smartMove !== -1) return smartMove;
-            }
-            return availableMoves[Math.floor(Math.random() * availableMoves.length)];
-        }
-
-        // Hard: Always smart moves
-        if (difficulty === 'hard') {
-            const winningMove = findWinningMove('O');
-            if (winningMove !== -1) return winningMove;
-
-            const blockingMove = findWinningMove('X');
-            if (blockingMove !== -1) return blockingMove;
-
-            return findBestMove();
-        }
-
-        return availableMoves[0];
-    }
-
-    function findWinningMove(player) {
+        
+        // Try to win
         for (let condition of winningConditions) {
             const [a, b, c] = condition;
             const line = [gameState[a], gameState[b], gameState[c]];
-            
-            if (line.filter(cell => cell === player).length === 2) {
-                const emptyIndex = condition.find(index => gameState[index] === '');
-                if (emptyIndex !== undefined) return emptyIndex;
+            if (line.filter(cell => cell === 'O').length === 2) {
+                const empty = condition.find(idx => gameState[idx] === '');
+                if (empty !== undefined) return empty;
             }
         }
-        return -1;
-    }
-
-    function findBestMove() {
-        // Prefer center, then corners, then edges
+        
+        // Block player
+        for (let condition of winningConditions) {
+            const [a, b, c] = condition;
+            const line = [gameState[a], gameState[b], gameState[c]];
+            if (line.filter(cell => cell === 'X').length === 2) {
+                const empty = condition.find(idx => gameState[idx] === '');
+                if (empty !== undefined) return empty;
+            }
+        }
+        
+        // Take center or random
         if (gameState[4] === '') return 4;
-        
-        const corners = [0, 2, 6, 8];
-        const availableCorners = corners.filter(index => gameState[index] === '');
-        if (availableCorners.length > 0) {
-            return availableCorners[Math.floor(Math.random() * availableCorners.length)];
-        }
-        
-        const edges = [1, 3, 5, 7];
-        const availableEdges = edges.filter(index => gameState[index] === '');
-        if (availableEdges.length > 0) {
-            return availableEdges[Math.floor(Math.random() * availableEdges.length)];
-        }
-        
-        return gameState.findIndex(cell => cell === '');
+        return available[Math.floor(Math.random() * available.length)];
     }
 
     function checkResult() {
@@ -382,20 +228,21 @@ function initializeGame(user) {
             const [a, b, c] = condition;
             if (gameState[a] && gameState[a] === gameState[b] && gameState[a] === gameState[c]) {
                 gameActive = false;
-                highlightWinningCells(condition);
+                condition.forEach(idx => {
+                    document.querySelector(`[data-index="${idx}"]`).classList.add('winner');
+                });
                 
                 if (gameState[a] === 'X') {
-                    statusDisplay.innerHTML = 'You Win! 🎉';
-                    sessionScores.player++;
-                    userManager.updateUserStats(user.username, 'win');
+                    statusDisplay.textContent = 'You Win! 🎉';
+                    scores.player++;
+                    user.stats.wins++;
                 } else {
-                    statusDisplay.innerHTML = 'Computer Wins! 🤖';
-                    sessionScores.computer++;
-                    userManager.updateUserStats(user.username, 'loss');
+                    statusDisplay.textContent = 'Computer Wins! 🤖';
+                    scores.computer++;
+                    user.stats.losses++;
                 }
-                
                 updateScores();
-                updatePlayerStats();
+                saveUserStats();
                 return true;
             }
         }
@@ -403,62 +250,47 @@ function initializeGame(user) {
         // Check draw
         if (!gameState.includes('')) {
             gameActive = false;
-            statusDisplay.innerHTML = 'Game Draw! 🤝';
-            freshCells.forEach(cell => cell.classList.add('draw'));
-            sessionScores.draw++;
-            userManager.updateUserStats(user.username, 'draw');
+            statusDisplay.textContent = 'Game Draw! 🤝';
+            scores.draw++;
+            user.stats.draws++;
             updateScores();
-            updatePlayerStats();
+            saveUserStats();
             return true;
         }
 
-        // Continue game
-        currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
-        statusDisplay.innerHTML = currentPlayer === 'X' ? 'Your Turn (X)' : 'Computer thinking...';
-        statusDisplay.classList.toggle('computer-thinking', currentPlayer === 'O');
+        currentPlayer = 'X';
+        statusDisplay.textContent = 'Your Turn (X)';
         return false;
     }
 
-    function highlightWinningCells(winningCombo) {
-        winningCombo.forEach(index => {
-            document.querySelector(`[data-index="${index}"]`).classList.add('winner');
-        });
-    }
-
     function updateScores() {
-        document.getElementById('playerScore').textContent = sessionScores.player;
-        document.getElementById('computerScore').textContent = sessionScores.computer;
-        document.getElementById('drawScore').textContent = sessionScores.draw;
+        document.getElementById('playerScore').textContent = scores.player;
+        document.getElementById('computerScore').textContent = scores.computer;
+        document.getElementById('drawScore').textContent = scores.draw;
     }
 
-    function updatePlayerStats() {
-        const currentUser = userManager.users.find(u => u.username === user.username);
-        if (currentUser) {
-            const statsElement = document.querySelector('.player-info');
-            statsElement.innerHTML = `Welcome, ${user.username}! <br>Stats: ${currentUser.stats.wins}W ${currentUser.stats.losses}L ${currentUser.stats.draws}D`;
-        }
+    function saveUserStats() {
+        localStorage.setItem('ticTacUsers', JSON.stringify(users));
     }
 
-    // Reset game function
-    function resetGame() {
+    // New Game button
+    resetButton.onclick = function() {
         currentPlayer = 'X';
         gameState = ['', '', '', '', '', '', '', '', ''];
         gameActive = true;
+        statusDisplay.textContent = 'Your Turn (X)';
         
-        statusDisplay.innerHTML = 'Your Turn (X)';
-        statusDisplay.classList.remove('computer-thinking');
-        
-        freshCells.forEach(cell => {
-            cell.textContent = '';
+        cells.forEach(cell => {
+            cell.textContent = '-';
             cell.classList.remove('x', 'o', 'winner', 'draw', 'player-move', 'computer-move');
         });
-        
-        // Re-attach event listeners after reset
-        freshCells.forEach(cell => {
-            cell.addEventListener('click', handleCellClick);
-        });
-    }
+    };
 
-    // Attach reset button event listener
-    resetButton.addEventListener('click', resetGame);
+    // Logout button
+    document.getElementById('logout').onclick = function() {
+        gameContainer.style.display = 'none';
+        document.querySelector('.auth-container').style.display = 'block';
+        document.getElementById('loginUsername').value = '';
+        document.getElementById('loginPassword').value = '';
+    };
 }
