@@ -9,8 +9,13 @@ if (users.length === 0) {
         password: "1234",
         stats: { wins: 0, losses: 0, draws: 0 }
     });
+// Save users to localStorage
+try {
     localStorage.setItem('ticTacUsers', JSON.stringify(users));
-}
+    console.log('Users saved to localStorage');
+} catch (error) {
+    console.error('Error saving to localStorage:', error);
+}}
 
 // DOM Elements
 const loginBox = document.getElementById('loginBox');
