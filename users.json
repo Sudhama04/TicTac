@@ -1,0 +1,46 @@
+[
+  {
+    "username": "demo_user",
+    "email": "demo@example.com",
+    "password": "d3ad9315b7be5dd53b31a273b3b3aba5defe700808305aa16a3062b76658a791",
+    "created_at": "2025-10-15T23:00:06.261412"
+  },
+  {
+    "username": "test_user",
+    "email": "test@example.com",
+    "password": "ecd71870d1963316a97e3ac3408c9835ad8cf0f3c1bc703527c30265534f75ae",
+    "created_at": "2025-10-15T23:00:06.277168"
+  },
+  {
+    "username": "game_player",
+    "email": "player@example.com",
+    "password": "609b1643c78233ca0fcbe12fe6abd3de06a7d1d679738c4f4ee9b239055217ff",
+    "created_at": "2025-10-15T23:06:31.966442",
+    "games_played": 0,
+    "games_won": 0
+  },
+  {
+    "username": "tic_tac_pro",
+    "email": "pro@example.com",
+    "password": "273c7631f4bc434dba37e3c6d41880b0553727f4d2e45b29d83dd64fcf71157e",
+    "created_at": "2025-10-15T23:06:31.977762",
+    "games_played": 0,
+    "games_won": 0
+  },
+  {
+    "username": "player1",
+    "email": "player1@example.com",
+    "password": "9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c",
+    "created_at": "2025-10-15T23:14:53.281910",
+    "games_played": 0,
+    "games_won": 0
+  },
+  {
+    "username": "gamer",
+    "email": "gamer@example.com",
+    "password": "609b1643c78233ca0fcbe12fe6abd3de06a7d1d679738c4f4ee9b239055217ff",
+    "created_at": "2025-10-15T23:14:53.295563",
+    "games_played": 0,
+    "games_won": 0
+  }
+]
