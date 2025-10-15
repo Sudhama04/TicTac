@@ -227,35 +227,48 @@ function showGame(user) {
         </div>
     `;
     
-    initializeGame(user);
+    // FIX: Wait for DOM to be ready
+    setTimeout(() => {
+        initializeGame(user);
+    }, 100);
     
     // Logout button
     document.getElementById('logout').addEventListener('click', function() {
         gameContainer.style.display = 'none';
         document.querySelector('.auth-container').style.display = 'block';
-        loginForm.reset();
+        document.getElementById('loginUsername').value = '';
+        document.getElementById('loginPassword').value = '';
     });
 }
 
-// Game Logic (same as before but with stats tracking)
+// Game Logic - Human vs Computer
 function initializeGame(user) {
     const cells = document.querySelectorAll('.cell');
     const statusDisplay = document.getElementById('status');
     const resetButton = document.getElementById('reset');
     const difficultySelect = document.getElementById('difficulty');
 
-    let currentPlayer = 'X';
+    let currentPlayer = 'X'; // Human always starts
     let gameState = ['', '', '', '', '', '', '', '', ''];
     let gameActive = true;
     let sessionScores = { player: 0, computer: 0, draw: 0 };
 
     const winningConditions = [
-        [0, 1, 2], [3, 4, 5], [6, 7, 8],
-        [0, 3, 6], [1, 4, 7], [2, 5, 8],
-        [0, 4, 8], [2, 4, 6]
+        [0, 1, 2], [3, 4, 5], [6, 7, 8], // rows
+        [0, 3, 6], [1, 4, 7], [2, 5, 8], // columns
+        [0, 4, 8], [2, 4, 6] // diagonals
     ];
 
+    // Initialize cells with event listeners
     cells.forEach(cell => {
+        // Remove any existing event listeners
+        cell.replaceWith(cell.cloneNode(true));
+    });
+
+    // Get fresh references after clone
+    const freshCells = document.querySelectorAll('.cell');
+    
+    freshCells.forEach(cell => {
         cell.addEventListener('click', handleCellClick);
         cell.classList.remove('x', 'o', 'winner', 'draw', 'player-move', 'computer-move');
     });
@@ -268,11 +281,13 @@ function initializeGame(user) {
 
         if (gameState[clickedCellIndex] !== '') return;
 
+        // Human move
         makeMove(clickedCellIndex, 'X');
         clickedCell.classList.add('player-move');
 
         if (checkResult()) return;
 
+        // Computer's turn
         currentPlayer = 'O';
         statusDisplay.innerHTML = 'Computer thinking...';
         statusDisplay.classList.add('computer-thinking');
@@ -281,7 +296,10 @@ function initializeGame(user) {
             if (gameActive) {
                 const computerMove = getComputerMove();
                 makeMove(computerMove, 'O');
-                document.querySelector(`[data-index="${computerMove}"]`).classList.add('computer-move');
+                
+                const computerCell = document.querySelector(`[data-index="${computerMove}"]`);
+                computerCell.classList.add('computer-move');
+                
                 checkResult();
             }
         }, 1000);
@@ -298,18 +316,21 @@ function initializeGame(user) {
         const difficulty = difficultySelect.value;
         let availableMoves = gameState.map((val, index) => val === '' ? index : null).filter(val => val !== null);
 
+        // Easy: Random moves
         if (difficulty === 'easy') {
             return availableMoves[Math.floor(Math.random() * availableMoves.length)];
         }
 
+        // Medium: Sometimes smart, sometimes random
         if (difficulty === 'medium') {
-            if (Math.random() < 0.7) {
+            if (Math.random() < 0.7) { // 70% smart moves
                 const smartMove = findWinningMove('O') || findWinningMove('X') || findBestMove();
                 if (smartMove !== -1) return smartMove;
             }
             return availableMoves[Math.floor(Math.random() * availableMoves.length)];
         }
 
+        // Hard: Always smart moves
         if (difficulty === 'hard') {
             const winningMove = findWinningMove('O');
             if (winningMove !== -1) return winningMove;
@@ -337,6 +358,7 @@ function initializeGame(user) {
     }
 
     function findBestMove() {
+        // Prefer center, then corners, then edges
         if (gameState[4] === '') return 4;
         
         const corners = [0, 2, 6, 8];
@@ -355,6 +377,7 @@ function initializeGame(user) {
     }
 
     function checkResult() {
+        // Check win
         for (let condition of winningConditions) {
             const [a, b, c] = condition;
             if (gameState[a] && gameState[a] === gameState[b] && gameState[a] === gameState[c]) {
@@ -377,10 +400,11 @@ function initializeGame(user) {
             }
         }
 
+        // Check draw
         if (!gameState.includes('')) {
             gameActive = false;
             statusDisplay.innerHTML = 'Game Draw! 🤝';
-            cells.forEach(cell => cell.classList.add('draw'));
+            freshCells.forEach(cell => cell.classList.add('draw'));
             sessionScores.draw++;
             userManager.updateUserStats(user.username, 'draw');
             updateScores();
@@ -388,6 +412,7 @@ function initializeGame(user) {
             return true;
         }
 
+        // Continue game
         currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
         statusDisplay.innerHTML = currentPlayer === 'X' ? 'Your Turn (X)' : 'Computer thinking...';
         statusDisplay.classList.toggle('computer-thinking', currentPlayer === 'O');
@@ -414,8 +439,7 @@ function initializeGame(user) {
         }
     }
 
-    resetButton.addEventListener('click', resetGame);
-
+    // Reset game function
     function resetGame() {
         currentPlayer = 'X';
         gameState = ['', '', '', '', '', '', '', '', ''];
@@ -424,9 +448,17 @@ function initializeGame(user) {
         statusDisplay.innerHTML = 'Your Turn (X)';
         statusDisplay.classList.remove('computer-thinking');
         
-        cells.forEach(cell => {
+        freshCells.forEach(cell => {
             cell.textContent = '';
             cell.classList.remove('x', 'o', 'winner', 'draw', 'player-move', 'computer-move');
         });
+        
+        // Re-attach event listeners after reset
+        freshCells.forEach(cell => {
+            cell.addEventListener('click', handleCellClick);
+        });
     }
+
+    // Attach reset button event listener
+    resetButton.addEventListener('click', resetGame);
 }
