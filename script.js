@@ -2,6 +2,7 @@
 let users = JSON.parse(localStorage.getItem('ticTacUsers') || '[]');
 
 // Add default user if none exists
+// Add default user if none exists
 if (users.length === 0) {
     users.push({
         username: "player",
@@ -9,6 +10,14 @@ if (users.length === 0) {
         password: "1234",
         stats: { wins: 0, losses: 0, draws: 0 }
     });
+    // Save to localStorage
+    try {
+        localStorage.setItem('ticTacUsers', JSON.stringify(users));
+        console.log('Default user created and saved');
+    } catch (error) {
+        console.error('Error saving default user:', error);
+    }
+}
 // Save users to localStorage
 try {
     localStorage.setItem('ticTacUsers', JSON.stringify(users));
@@ -78,12 +87,20 @@ registerForm.addEventListener('submit', function(e) {
         stats: { wins: 0, losses: 0, draws: 0 }
     };
     
-    users.push(newUser);
+   users.push(newUser);
+
+// Save to localStorage - IDI IMPORTANT
+try {
     localStorage.setItem('ticTacUsers', JSON.stringify(users));
-    alert('Registration successful!');
-    registerBox.style.display = 'none';
-    loginBox.style.display = 'block';
-    registerForm.reset();
+    console.log('New user saved to localStorage');
+} catch (error) {
+    console.error('Error saving user:', error);
+}
+
+alert('Registration successful!');
+
+// Auto login after registration - DON'T GO BACK TO LOGIN!
+showGame(newUser);
 });
 
 // Show Game - FIXED
