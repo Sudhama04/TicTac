@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic Tac Toe - Login</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="auth-container">
+        <!-- Login Form -->
+        <div class="auth-box" id="loginBox">
+            <h1>Login to Tic Tac Toe</h1>
+            
+            <form id="loginForm">
+                <div class="input-group">
+                    <label for="loginUsername">Username:</label>
+                    <input type="text" id="loginUsername" placeholder="Enter username" required>
+                </div>
+                
+                <div class="input-group">
+                    <label for="loginPassword">Password:</label>
+                    <input type="password" id="loginPassword" placeholder="Enter password" required>
+                </div>
+                
+                <button type="submit" class="auth-btn">Login</button>
+            </form>
+            
+            <p class="auth-switch">Don't have an account? <a href="#" id="showRegister">Register here</a></p>
+        </div>
+
+        <!-- Register Form -->
+        <div class="auth-box" id="registerBox" style="display: none;">
+            <h1>Create Account</h1>
+            
+            <form id="registerForm">
+                <div class="input-group">
+                    <label for="regUsername">Username:</label>
+                    <input type="text" id="regUsername" placeholder="Choose username" required minlength="3">
+                </div>
+                
+                <div class="input-group">
+                    <label for="regEmail">Email:</label>
+                    <input type="email" id="regEmail" placeholder="Enter email" required>
+                </div>
+                
+                <div class="input-group">
+                    <label for="regPassword">Password:</label>
+                    <input type="password" id="regPassword" placeholder="Create password" required minlength="4">
+                </div>
+                
+                <div class="input-group">
+                    <label for="regConfirmPassword">Confirm Password:</label>
+                    <input type="password" id="regConfirmPassword" placeholder="Confirm password" required>
+                </div>
+                
+                <button type="submit" class="auth-btn">Create Account</button>
+            </form>
+            
+            <p class="auth-switch">Already have an account? <a href="#" id="showLogin">Login here</a></p>
+        </div>
+    </div>
+    
+    <div class="game-container"></div>
+    
+    <script src="script.js"></script>
+</body>
+</html>
