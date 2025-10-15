@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎮 Tic-Tac-Toe Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+        }
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 2rem;
+        }
+        .info {
+            color: #666;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        .game-board {
+            display: grid;
+            grid-template-columns: repeat(3, 80px);
+            grid-template-rows: repeat(3, 80px);
+            gap: 8px;
+            margin: 20px auto;
+        }
+        .cell {
+            width: 80px;
+            height: 80px;
+            background: #f8f9fa;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .cell:hover {
+            background: #e3f2fd;
+            transform: scale(1.05);
+        }
+        .cell.x {
+            color: #e74c3c;
+        }
+        .cell.o {
+            color: #2ecc71;
+        }
+        .game-info {
+            margin: 15px 0;
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        button {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            margin: 5px;
+            transition: all 0.3s ease;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .note {
+            margin-top: 20px;
+            padding: 12px;
+            background: #e8f4fd;
+            border-radius: 8px;
+            font-size: 12px;
+            color: #666;
+            border-left: 4px solid #667eea;
+        }
+        .score-board {
+            display: flex;
+            justify-content: space-around;
+            margin: 15px 0;
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎮 Tic-Tac-Toe</h1>
+        <p class="info">Play against Computer - You are X</p>
+        
+        <div class="score-board">
+            <div>🎯 You: <span id="playerScore">0</span></div>
+            <div>🤖 Computer: <span id="computerScore">0</span></div>
+        </div>
+        
+        <div class="game-info" id="gameStatus">Your turn! Click any box</div>
+        
+        <div class="game-board" id="gameBoard">
+            <div class="cell" data-index="0"></div>
+            <div class="cell" data-index="1"></div>
+            <div class="cell" data-index="2"></div>
+            <div class="cell" data-index="3"></div>
+            <div class="cell" data-index="4"></div>
+            <div class="cell" data-index="5"></div>
+            <div class="cell" data-index="6"></div>
+            <div class="cell" data-index="7"></div>
+            <div class="cell" data-index="8"></div>
+        </div>
+        
+        <button onclick="resetGame()">🔄 New Game</button>
+        <button onclick="showInstructions()">📖 How to Play</button>
+        
+        <div class="note">
+            <strong>For full version with login system:</strong><br>
+            Download and run <code>project.ipynb</code> in Jupyter Notebook
+        </div>
+    </div>
+
+    <script>
+        let currentPlayer = 'X';
+        let gameBoard = ['', '', '', '', '', '', '', '', ''];
+        let gameActive = true;
+        let playerScore = 0;
+        let computerScore = 0;
+
+        const winningConditions = [
+            [0, 1, 2], [3, 4, 5], [6, 7, 8],
+            [0, 3, 6], [1, 4, 7], [2, 5, 8],
+            [0, 4, 8], [2, 4, 6]
+        ];
+
+        // Initialize game
+        document.querySelectorAll('.cell').forEach(cell => {
+            cell.addEventListener('click', handleCellClick);
+        });
+
+        function handleCellClick(e) {
+            const clickedCell = e.target;
+            const cellIndex = parseInt(clickedCell.getAttribute('data-index'));
+
+            if (gameBoard[cellIndex] !== '' || !gameActive || currentPlayer !== 'X') {
+                return;
+            }
+
+            // Player's move
+            makeMove(clickedCell, cellIndex, 'X');
+            
+            if (checkGameResult()) return;
+
+            // Computer's move after delay
+            setTimeout(makeComputerMove, 500);
+        }
+
+        function makeMove(cell, index, player) {
+            gameBoard[index] = player;
+            cell.textContent = player;
+            cell.classList.add(player.toLowerCase());
+        }
+
+        function makeComputerMove() {
+            if (!gameActive) return;
+
+            // Find empty cells
+            const emptyCells = gameBoard
+                .map((cell, index) => cell === '' ? index : null)
+                .filter(cell => cell !== null);
+
+            if (emptyCells.length > 0) {
+                const randomIndex = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+                const computerCell = document.querySelector(`[data-index="${randomIndex}"]`);
+                
+                makeMove(computerCell, randomIndex, 'O');
+                checkGameResult();
+            }
+        }
+
+        function checkGameResult() {
+            let roundWon = false;
+
+            for (let i = 0; i < winningConditions.length; i++) {
+                const [a, b, c] = winningConditions[i];
+                if (gameBoard[a] && gameBoard[a] === gameBoard[b] && gameBoard[a] === gameBoard[c]) {
+                    roundWon = true;
+                    break;
+                }
+            }
+
+            if (roundWon) {
+                gameActive = false;
+                if (currentPlayer === 'X') {
+                    document.getElementById('gameStatus').textContent = "🎉 You win!";
+                    playerScore++;
+                    document.getElementById('playerScore').textContent = playerScore;
+                } else {
+                    document.getElementById('gameStatus').textContent = "🤖 Computer wins!";
+                    computerScore++;
+                    document.getElementById('computerScore').textContent = computerScore;
+                }
+                return true;
+            }
+
+            if (!gameBoard.includes('')) {
+                gameActive = false;
+                document.getElementById('gameStatus').textContent = "🤝 It's a draw!";
+                return true;
+            }
+
+            currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+            document.getElementById('gameStatus').textContent = currentPlayer === 'X' ? "Your turn!" : "Computer thinking...";
+            return false;
+        }
+
+        function resetGame() {
+            gameBoard = ['', '', '', '', '', '', '', '', ''];
+            gameActive = true;
+            currentPlayer = 'X';
+            document.getElementById('gameStatus').textContent = "Your turn! Click any box";
+            
+            document.querySelectorAll('.cell').forEach(cell => {
+                cell.textContent = '';
+                cell.classList.remove('x', 'o');
+            });
+        }
+
+        function showInstructions() {
+            alert("🎮 How to Play:
+
+• You are X, Computer is O
+• Click any empty box to make your move
+• Get 3 in a row to win!
+• Track your score against computer
+
+For full version with login system, run project.ipynb in Jupyter Notebook!");
+        }
+
+        // Initialize the game
+        resetGame();
+    </script>
+</body>
+</html>
