@@ -14,10 +14,12 @@ body {
     padding: 20px;
 }
 
-/* Auth Container Styles */
+/* Auth Container Styles - FIXED */
 .auth-container {
     width: 100%;
     max-width: 400px;
+    position: relative;
+    min-height: 500px;
 }
 
 .auth-box {
@@ -26,6 +28,13 @@ body {
     border-radius: 15px;
     box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
     text-align: center;
+    width: 100%;
+    transition: all 0.3s ease;
+}
+
+/* Hide register by default */
+#registerBox {
+    display: none;
 }
 
 .auth-box h1 {
