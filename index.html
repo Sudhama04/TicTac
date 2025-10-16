@@ -4,7 +4,314 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tic Tac Toe - Login</title>
-    <link rel="stylesheet" href="style.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .auth-container {
+            width: 100%;
+            max-width: 400px;
+            position: relative;
+        }
+
+        .auth-box {
+            background: white;
+            padding: 40px 30px;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 100%;
+        }
+
+        #registerBox {
+            display: none;
+        }
+
+        .auth-box h1 {
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .auth-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .auth-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .auth-switch {
+            margin-top: 20px;
+            color: #666;
+        }
+
+        .auth-switch a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .auth-switch a:hover {
+            text-decoration: underline;
+        }
+
+        .game-container {
+            display: none;
+            width: 100%;
+            max-width: 500px;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .game-container h1 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 32px;
+        }
+
+        .player-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-weight: 600;
+            color: #333;
+            border-left: 4px solid #667eea;
+        }
+
+        .score-board {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .score-item {
+            text-align: center;
+            flex: 1;
+        }
+
+        .score-label {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .score-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .difficulty {
+            margin-bottom: 20px;
+        }
+
+        .difficulty label {
+            margin-right: 10px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .difficulty select {
+            padding: 8px 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 6px;
+            font-size: 14px;
+            background: white;
+        }
+
+        .status {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            padding: 10px;
+            background: #e7f3ff;
+            border-radius: 8px;
+            color: #0066cc;
+        }
+
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+            max-width: 300px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .cell {
+            aspect-ratio: 1;
+            background: #f8f9fa;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .cell:hover {
+            background: #e9ecef;
+            transform: scale(1.05);
+        }
+
+        .cell.x {
+            color: #dc3545;
+            background: #ffe6e6;
+        }
+
+        .cell.o {
+            color: #007bff;
+            background: #e6f3ff;
+        }
+
+        .cell.winner {
+            background: #d4edda;
+            border-color: #28a745;
+            animation: pulse 0.5s ease-in-out;
+        }
+
+        .cell.player-move {
+            animation: pop 0.3s ease-in-out;
+        }
+
+        .cell.computer-move {
+            animation: pop 0.3s ease-in-out;
+        }
+
+        @keyframes pop {
+            0% { transform: scale(0.8); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .game-controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .game-controls button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        #reset {
+            background: #28a745;
+            color: white;
+        }
+
+        #reset:hover {
+            background: #218838;
+            transform: translateY(-2px);
+        }
+
+        #logout {
+            background: #6c757d;
+            color: white;
+        }
+
+        #logout:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+            
+            .auth-box, .game-container {
+                padding: 20px 15px;
+            }
+            
+            .score-board {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .game-controls {
+                flex-direction: column;
+            }
+            
+            .cell {
+                font-size: 28px;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="auth-container">
@@ -63,6 +370,305 @@
     
     <div class="game-container"></div>
     
-    <script src="script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // User Management
+            let users = JSON.parse(localStorage.getItem('ticTacUsers') || '[]');
+
+            // Add default user if none exists
+            if (users.length === 0) {
+                users.push({
+                    username: "player",
+                    email: "player@example.com", 
+                    password: "1234",
+                    stats: { wins: 0, losses: 0, draws: 0 }
+                });
+                localStorage.setItem('ticTacUsers', JSON.stringify(users));
+            }
+
+            // DOM Elements
+            const loginBox = document.getElementById('loginBox');
+            const registerBox = document.getElementById('registerBox');
+            const loginForm = document.getElementById('loginForm');
+            const registerForm = document.getElementById('registerForm');
+            const showRegister = document.getElementById('showRegister');
+            const showLogin = document.getElementById('showLogin');
+            const gameContainer = document.querySelector('.game-container');
+
+            // Switch between forms
+            showRegister.addEventListener('click', (e) => {
+                e.preventDefault();
+                loginBox.style.display = 'none';
+                registerBox.style.display = 'block';
+            });
+
+            showLogin.addEventListener('click', (e) => {
+                e.preventDefault();
+                registerBox.style.display = 'none';
+                loginBox.style.display = 'block';
+            });
+
+            // Login Function
+            loginForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const username = document.getElementById('loginUsername').value;
+                const password = document.getElementById('loginPassword').value;
+                
+                const user = users.find(u => u.username === username && u.password === password);
+                if (user) {
+                    showGame(user);
+                } else {
+                    alert('Invalid login! Try: player/1234');
+                }
+            });
+
+            // Register Function
+            registerForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const username = document.getElementById('regUsername').value;
+                const email = document.getElementById('regEmail').value;
+                const password = document.getElementById('regPassword').value;
+                const confirmPassword = document.getElementById('regConfirmPassword').value;
+                
+                if (password !== confirmPassword) {
+                    alert('Passwords do not match!');
+                    return;
+                }
+                
+                if (users.find(u => u.username === username)) {
+                    alert('Username already exists!');
+                    return;
+                }
+                
+                // Create new user
+                const newUser = {
+                    username: username,
+                    email: email,
+                    password: password,
+                    stats: { wins: 0, losses: 0, draws: 0 }
+                };
+                
+                users.push(newUser);
+                localStorage.setItem('ticTacUsers', JSON.stringify(users));
+
+                alert('Registration successful!');
+                showGame(newUser);
+            });
+
+            // Show Game Function
+            function showGame(user) {
+                document.querySelector('.auth-container').style.display = 'none';
+                gameContainer.style.display = 'block';
+                
+                gameContainer.innerHTML = `
+                    <h1>Tic Tac Toe</h1>
+                    <div class="player-info">Welcome, ${user.username}! (W:${user.stats.wins} L:${user.stats.losses} D:${user.stats.draws})</div>
+                    
+                    <div class="score-board">
+                        <div class="score-item">
+                            <div class="score-label">You (X)</div>
+                            <div class="score-value" id="playerScore">0</div>
+                        </div>
+                        <div class="score-item">
+                            <div class="score-label">Draws</div>
+                            <div class="score-value" id="drawScore">0</div>
+                        </div>
+                        <div class="score-item">
+                            <div class="score-label">Computer (O)</div>
+                            <div class="score-value" id="computerScore">0</div>
+                        </div>
+                    </div>
+                    
+                    <div class="difficulty">
+                        <label for="difficulty">Difficulty:</label>
+                        <select id="difficulty">
+                            <option value="easy">Easy</option>
+                            <option value="medium" selected>Medium</option>
+                            <option value="hard">Hard</option>
+                        </select>
+                    </div>
+                    
+                    <div class="status" id="status">Your Turn (X)</div>
+                    <div class="board" id="board">
+                        <div class="cell" data-index="0"></div>
+                        <div class="cell" data-index="1"></div>
+                        <div class="cell" data-index="2"></div>
+                        <div class="cell" data-index="3"></div>
+                        <div class="cell" data-index="4"></div>
+                        <div class="cell" data-index="5"></div>
+                        <div class="cell" data-index="6"></div>
+                        <div class="cell" data-index="7"></div>
+                        <div class="cell" data-index="8"></div>
+                    </div>
+                    <div class="game-controls">
+                        <button id="reset">New Game</button>
+                        <button id="logout">Logout</button>
+                    </div>
+                `;
+                
+                initGame(user);
+            }
+
+            // Game Logic
+            function initGame(user) {
+                let currentPlayer = 'X';
+                let gameState = ['', '', '', '', '', '', '', '', ''];
+                let gameActive = true;
+                let scores = { player: 0, computer: 0, draw: 0 };
+
+                const winningConditions = [
+                    [0, 1, 2], [3, 4, 5], [6, 7, 8],
+                    [0, 3, 6], [1, 4, 7], [2, 5, 8], 
+                    [0, 4, 8], [2, 4, 6]
+                ];
+
+                const statusDisplay = document.getElementById('status');
+                const resetButton = document.getElementById('reset');
+                const logoutButton = document.getElementById('logout');
+
+                // Cell click handler
+                function handleCellClick(e) {
+                    if (!gameActive || currentPlayer !== 'X') return;
+                    
+                    const cell = e.target;
+                    const index = parseInt(cell.getAttribute('data-index'));
+                    
+                    if (gameState[index] !== '') return;
+                    
+                    // Human move
+                    makeMove(index, 'X');
+                    cell.classList.add('player-move');
+                    
+                    if (checkGameResult()) return;
+                    
+                    // Computer move
+                    currentPlayer = 'O';
+                    statusDisplay.textContent = 'Computer thinking...';
+                    
+                    setTimeout(() => {
+                        if (gameActive) {
+                            const compMove = getComputerMove();
+                            makeMove(compMove, 'O');
+                            document.querySelector(`[data-index="${compMove}"]`).classList.add('computer-move');
+                            checkGameResult();
+                        }
+                    }, 800);
+                }
+
+                // Add event listeners to cells
+                document.querySelectorAll('.cell').forEach(cell => {
+                    cell.addEventListener('click', handleCellClick);
+                });
+
+                function makeMove(index, player) {
+                    gameState[index] = player;
+                    const cell = document.querySelector(`[data-index="${index}"]`);
+                    cell.textContent = player;
+                    cell.classList.add(player.toLowerCase());
+                }
+
+                function getComputerMove() {
+                    const difficulty = document.getElementById('difficulty').value;
+                    let available = gameState.map((val, idx) => val === '' ? idx : null).filter(val => val !== null);
+                    
+                    if (difficulty === 'easy') {
+                        return available[Math.floor(Math.random() * available.length)];
+                    }
+                    
+                    // Try to win
+                    for (let condition of winningConditions) {
+                        const [a, b, c] = condition;
+                        if (gameState[a] === 'O' && gameState[b] === 'O' && gameState[c] === '') return c;
+                        if (gameState[a] === 'O' && gameState[c] === 'O' && gameState[b] === '') return b;
+                        if (gameState[b] === 'O' && gameState[c] === 'O' && gameState[a] === '') return a;
+                    }
+                    
+                    // Block player
+                    for (let condition of winningConditions) {
+                        const [a, b, c] = condition;
+                        if (gameState[a] === 'X' && gameState[b] === 'X' && gameState[c] === '') return c;
+                        if (gameState[a] === 'X' && gameState[c] === 'X' && gameState[b] === '') return b;
+                        if (gameState[b] === 'X' && gameState[c] === 'X' && gameState[a] === '') return a;
+                    }
+                    
+                    // Take center or random
+                    if (gameState[4] === '') return 4;
+                    return available[Math.floor(Math.random() * available.length)];
+                }
+
+                function checkGameResult() {
+                    // Check win
+                    for (let condition of winningConditions) {
+                        const [a, b, c] = condition;
+                        if (gameState[a] && gameState[a] === gameState[b] && gameState[a] === gameState[c]) {
+                            gameActive = false;
+                            condition.forEach(idx => {
+                                document.querySelector(`[data-index="${idx}"]`).classList.add('winner');
+                            });
+                            
+                            if (gameState[a] === 'X') {
+                                statusDisplay.textContent = 'You Win! 🎉';
+                                scores.player++;
+                                user.stats.wins++;
+                            } else {
+                                statusDisplay.textContent = 'Computer Wins! 🤖';
+                                scores.computer++;
+                                user.stats.losses++;
+                            }
+                            updateScores();
+                            saveUserStats();
+                            return true;
+                        }
+                    }
+
+                    // Check draw
+                    if (!gameState.includes('')) {
+                        gameActive = false;
+                        statusDisplay.textContent = 'Game Draw! 🤝';
+                        scores.draw++;
+                        user.stats.draws++;
+                        updateScores();
+                        saveUserStats();
+                        return true;
+                    }
+
+                    currentPlayer = 'X';
+                    statusDisplay.textContent = 'Your Turn (X)';
+                    return false;
+                }
+
+                function updateScores() {
+                    document.getElementById('playerScore').textContent = scores.player;
+                    document.getElementById('computerScore').textContent = scores.computer;
+                    document.getElementById('drawScore').textContent = scores.draw;
+                }
+
+                function saveUserStats() {
+                    localStorage.setItem('ticTacUsers', JSON.stringify(users));
+                }
+
+                // New Game button
+                resetButton.addEventListener('click', function() {
+                    currentPlayer = 'X';
+                    gameState = ['', '', '', '', '', '', '', '', ''];
+                    gameActive = true;
+                    statusDisplay.textContent = 'Your Turn (X)';
+                    
+                    document.querySelectorAll('.cell').forEach(cell => {
+                        cell.textContent = '';
+                        cell.classList.remove('x', 'o', 'winner', 'player-move', 'computer-move');
+                    });
+                });
+
+                // Logout button
+                logoutButton.addEventListener('click', function() {
+                    gameContainer.style.display = 'none';
+                    document.querySelector('.auth-container').style.display = 'block';
+                    document.getElementById('loginUsername').value = '';
+                    document.getElementById('loginPassword').value = '';
+                });
+            }
+        });
+    </script>
 </body>
 </html>
