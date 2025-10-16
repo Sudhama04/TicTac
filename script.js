@@ -2,7 +2,6 @@
 let users = JSON.parse(localStorage.getItem('ticTacUsers') || '[]');
 
 // Add default user if none exists
-// Add default user if none exists
 if (users.length === 0) {
     users.push({
         username: "player",
@@ -18,13 +17,6 @@ if (users.length === 0) {
         console.error('Error saving default user:', error);
     }
 }
-// Save users to localStorage
-try {
-    localStorage.setItem('ticTacUsers', JSON.stringify(users));
-    console.log('Users saved to localStorage');
-} catch (error) {
-    console.error('Error saving to localStorage:', error);
-}}
 
 // DOM Elements
 const loginBox = document.getElementById('loginBox');
@@ -87,23 +79,21 @@ registerForm.addEventListener('submit', function(e) {
         stats: { wins: 0, losses: 0, draws: 0 }
     };
     
-   users.push(newUser);
+    users.push(newUser);
 
-// Save to localStorage - IDI IMPORTANT
-try {
-    localStorage.setItem('ticTacUsers', JSON.stringify(users));
-    console.log('New user saved to localStorage');
-} catch (error) {
-    console.error('Error saving user:', error);
-}
+    // Save to localStorage
+    try {
+        localStorage.setItem('ticTacUsers', JSON.stringify(users));
+        console.log('New user saved to localStorage');
+    } catch (error) {
+        console.error('Error saving user:', error);
+    }
 
-alert('Registration successful!');
-
-// Auto login after registration - DON'T GO BACK TO LOGIN!
-showGame(newUser);
+    alert('Registration successful!');
+    showGame(newUser);
 });
 
-// Show Game - FIXED
+// Show Game
 function showGame(user) {
     document.querySelector('.auth-container').style.display = 'none';
     gameContainer.style.display = 'block';
@@ -158,7 +148,7 @@ function showGame(user) {
     initGame(user);
 }
 
-// Game Logic - COMPLETELY FIXED
+// Game Logic
 function initGame(user) {
     let currentPlayer = 'X';
     let gameState = ['', '', '', '', '', '', '', '', ''];
@@ -175,7 +165,7 @@ function initGame(user) {
     const resetButton = document.getElementById('reset');
     const logoutButton = document.getElementById('logout');
 
-    // Cell click handler - SIMPLE & WORKING
+    // Cell click handler
     function handleCellClick(e) {
         if (!gameActive || currentPlayer !== 'X') return;
         
@@ -293,10 +283,14 @@ function initGame(user) {
     }
 
     function saveUserStats() {
-        localStorage.setItem('ticTacUsers', JSON.stringify(users));
+        try {
+            localStorage.setItem('ticTacUsers', JSON.stringify(users));
+        } catch (error) {
+            console.error('Error saving user stats:', error);
+        }
     }
 
-    // NEW GAME BUTTON - FIXED & WORKING
+    // New Game button
     resetButton.addEventListener('click', function() {
         currentPlayer = 'X';
         gameState = ['', '', '', '', '', '', '', '', ''];
